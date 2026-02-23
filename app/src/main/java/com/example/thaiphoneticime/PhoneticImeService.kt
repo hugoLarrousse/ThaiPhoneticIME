@@ -198,7 +198,7 @@ private class ImeComposeHostView(
     content: @Composable () -> Unit
 ) : FrameLayout(context) {
     private val composeView = ComposeView(context).apply {
-        setViewCompositionStrategy(ViewCompositionStrategy.DisposeOnDetachedFromWindow)
+        setViewCompositionStrategy(ViewCompositionStrategy.DisposeOnViewTreeLifecycleDestroyed)
         setContent { content() }
     }
 
@@ -258,16 +258,23 @@ private class ImeComposeOwner : LifecycleOwner, ViewModelStoreOwner, SavedStateR
     }
 
     fun onStart() {
+        if (lifecycleRegistry.currentState.isAtLeast(Lifecycle.State.STARTED)) return
         lifecycleRegistry.handleLifecycleEvent(Lifecycle.Event.ON_START)
         lifecycleRegistry.handleLifecycleEvent(Lifecycle.Event.ON_RESUME)
     }
 
     fun onStop() {
+        if (!lifecycleRegistry.currentState.isAtLeast(Lifecycle.State.STARTED)) return
         lifecycleRegistry.handleLifecycleEvent(Lifecycle.Event.ON_PAUSE)
         lifecycleRegistry.handleLifecycleEvent(Lifecycle.Event.ON_STOP)
     }
 
     fun onDestroy() {
+        if (lifecycleRegistry.currentState == Lifecycle.State.DESTROYED) return
+        if (lifecycleRegistry.currentState.isAtLeast(Lifecycle.State.STARTED)) {
+            lifecycleRegistry.handleLifecycleEvent(Lifecycle.Event.ON_PAUSE)
+            lifecycleRegistry.handleLifecycleEvent(Lifecycle.Event.ON_STOP)
+        }
         lifecycleRegistry.handleLifecycleEvent(Lifecycle.Event.ON_DESTROY)
         store.clear()
     }
