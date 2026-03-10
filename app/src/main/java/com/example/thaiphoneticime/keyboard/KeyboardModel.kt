@@ -56,8 +56,9 @@ private fun longPressVariants(
     accentTargets: List<String> = listOf(base)
 ): List<String> {
     val variants = linkedSetOf<String>()
-    variants.add(base)
-    extras.forEach(variants::add)
+    extras
+        .filterNot { it == base }
+        .forEach(variants::add)
     accentTargets.forEach { target ->
         accentVariants(target).forEach(variants::add)
     }
@@ -80,32 +81,11 @@ private fun letterKey(
 private fun azertyLetterKey(letter: String): KeySpec {
     return when (letter) {
         "a" -> letterKey(letter, longPressVariants = longPressVariants(base = "a"))
-        "e" -> letterKey(
-            letter,
-            longPressVariants = longPressVariants(
-                base = "e",
-                extras = listOf("ə", "ɛ"),
-                accentTargets = listOf("e", "ə", "ɛ")
-            )
-        )
+        "e" -> letterKey(letter, longPressVariants = longPressVariants(base = "e"))
         "i" -> letterKey(letter, longPressVariants = longPressVariants(base = "i"))
-        "u" -> letterKey(
-            letter,
-            longPressVariants = longPressVariants(
-                base = "u",
-                extras = listOf("ʉ"),
-                accentTargets = listOf("u", "ʉ")
-            )
-        )
-        "n" -> letterKey(letter, longPressVariants = listOf("n", "ŋ"))
-        "o" -> letterKey(
-            letter,
-            longPressVariants = longPressVariants(
-                base = "o",
-                extras = listOf("ɔ"),
-                accentTargets = listOf("o", "ɔ")
-            )
-        )
+        "u" -> letterKey(letter, longPressVariants = longPressVariants(base = "u"))
+        "n" -> letterKey(letter, longPressVariants = listOf("ŋ"))
+        "o" -> letterKey(letter, longPressVariants = longPressVariants(base = "o"))
         else -> letterKey(letter)
     }
 }

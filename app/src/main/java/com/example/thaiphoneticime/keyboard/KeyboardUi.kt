@@ -104,7 +104,7 @@ private fun KeyButton(
 
     val longPressOptions = keySpec.longPress.orEmpty()
     val longPressAction = keySpec.longPressAction
-    val popupRows = popupRowsForKey(keySpec, longPressOptions)
+    val popupRows = popupRowsForKey(longPressOptions)
     val popupOptionsByRow = remember(keySpec.label, popupRows) {
         var nextId = 0
         popupRows.map { popupRow ->
@@ -156,7 +156,7 @@ private fun KeyButton(
         Box(
             modifier = Modifier
                 .fillMaxWidth()
-                .heightIn(min = 50.dp)
+                .heightIn(min = 48.dp)
                 .clip(RoundedCornerShape(10.dp))
                 .background(keyBackgroundColor)
                 .onGloballyPositioned { coordinates ->
@@ -422,18 +422,9 @@ private fun keyPalette(keySpec: KeySpec): Pair<Color, Color> {
     }
 }
 
-private fun popupRowsForKey(keySpec: KeySpec, options: List<KeySpec>): List<List<KeySpec>> {
+private fun popupRowsForKey(options: List<KeySpec>): List<List<KeySpec>> {
     if (options.isEmpty()) return emptyList()
-    val baseCommit = (keySpec.action as? KeyAction.CommitText)?.text?.lowercase()
-    val useTwoRows = baseCommit == "e" || baseCommit == "u" || baseCommit == "o"
-    if (!useTwoRows || options.size < 2) {
-        return listOf(options)
-    }
-    val splitIndex = (options.size + 1) / 2
-    return listOf(
-        options.take(splitIndex),
-        options.drop(splitIndex)
-    )
+    return listOf(options)
 }
 
 private class KeyPopupPositionProvider(
